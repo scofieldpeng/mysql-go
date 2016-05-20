@@ -1,3 +1,5 @@
 # mysql-go
 
-a simple mysql library forgolang projects
+a simple mysql package for golang projects base on xorm
+
+
