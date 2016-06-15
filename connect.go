@@ -56,8 +56,8 @@ func Select(node ...string) *engine {
 	return engines[node[0]]
 }
 
-// Init 初始化mysql,传入ini.File类型的值,将会解析所有的配置项
-func Init(iniConfigs ini.File) error {
+// Init 初始化mysql,传入ini.File类型的值,将会解析所有的配置项,第二个参数为debug模式,当为debug模式时,会默认输出mysql的sql语句以及exectime
+func Init(iniConfigs ini.File,debug bool) error {
 	engines = make(map[string]*engine)
 
 	idleNum:= config.Int(iniConfigs.Get("pool","idleNum"))
@@ -90,6 +90,8 @@ func Init(iniConfigs ini.File) error {
 
 					xormEngine.SetMaxIdleConns(idleNum)
 					xormEngine.SetMaxOpenConns(maxOpenConn)
+					xormEngine.ShowExecTime(debug)
+					xormEngine.ShowSQL(debug)
 
 					e = &engine{
 						xormEngine:xormEngine,
