@@ -7,23 +7,28 @@ import (
 
 func TestInit(t *testing.T) {
 	testConfig := ini.File{
-		"node_default": ini.Section{
+		"mysql_node_default": ini.Section{
 			"dsn":   "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4",
 			"slave": "slave1,slave2",
 		},
-		"node_slave1": ini.Section{
+		"mysql_node_slave1": ini.Section{
 			"dsn": "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4",
 		},
-		"node_slave2": ini.Section{
+		"mysql_node_slave2": ini.Section{
 			"dsn": "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4",
 		},
 	}
+	mysqlConfig := Config{
+		Debug:   true,
+		MaxIdle: 5,
+		MaxConn: 10,
+	}
 
-	if err := Init(testConfig); err != nil {
+	if err := Init(mysqlConfig, testConfig); err != nil {
 		t.Fatal("init fail!error:", err.Error())
 	}
 
-	if res, err := Select().XormEngine().Exec("CREATE TABLE `test` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`value` int(11) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"); err != nil {
+	if res, err := Select().Engine().Exec("CREATE TABLE `test` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`value` int(11) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"); err != nil {
 		t.Fatal("create table fail,error:", err)
 	} else {
 		if _, err := res.RowsAffected(); err != nil {
@@ -36,7 +41,7 @@ func TestInit(t *testing.T) {
 		Value int `xorm:"not null INT(11)"`
 	}
 
-	if _, err := Select().Slave().XormEngine().Insert(&Test{
+	if _, err := Select().Slave().Insert(&Test{
 		Id:    1,
 		Value: 2,
 	}); err != nil {
@@ -47,10 +52,9 @@ func TestInit(t *testing.T) {
 		Id: 1,
 	}
 
-	if exist, err := Select().Slave("slave2").XormEngine().Get(&ts); err != nil {
+	if exist, err := Select().Slave("slave2").Get(&ts); err != nil {
 		t.Error("get data fail!error:", err)
 	} else if !exist {
 		t.Error("data not exsit!")
 	}
-
 }

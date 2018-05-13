@@ -167,7 +167,7 @@ func Init(mysqlConfig Config, connConfig ini.File) error {
 
 	for k, _ := range connConfig {
 		if strings.Index(k, DEFAULT_CONN_PREFIX) == 0 {
-			sectionName := string([]byte(k)[strlen(DEFAULT_CONN_PREFIX):])
+			sectionName := string([]byte(k)[len(DEFAULT_CONN_PREFIX):])
 			if len(sectionName) > 0 && appConfig.String(connConfig.Get(k, "dsn")) != "" {
 				connNameMap[sectionName] = true
 			}
