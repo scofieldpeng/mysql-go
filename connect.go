@@ -92,6 +92,8 @@ var (
 
 	// Engine没有找到
 	ErrEngineNotFound = errors.New("not found engine")
+	// mysql操作影响了0行
+	ErrAffectedZeroRow = errors.New("affect 0 rows")
 )
 
 // 设置config，如果传入的值存在，则覆盖默认配置项目
