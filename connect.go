@@ -93,6 +93,7 @@ var (
 		LogPrefix: xorm.DEFAULT_LOG_PREFIX,
 		LogFlag:   xorm.DEFAULT_LOG_FLAG,
 		LogLevel:  xorm.DEFAULT_LOG_LEVEL,
+		Timeout:   DefaultTimeout,
 	}
 
 	// Engine没有找到
@@ -231,10 +232,10 @@ func Init(mysqlConfig Config, connConfig ini.File) error {
 		fmt.Println("[warning]config中没有找到default的配置项，请勿使用mysql.Select()或者mysql.Select(\"default\")")
 	}
 
-	go func(){
-		for _,v := range engines {
+	go func() {
+		for _, v := range engines {
 			go func() {
-				for{
+				for {
 					v.xormEngine.Ping()
 					time.Sleep(config.Timeout)
 				}
