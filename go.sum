@@ -1,0 +1,13 @@
+github.com/go-sql-driver/mysql v1.4.0 h1:7LxgVwFb2hIQtMm87NdgAVfXjnt4OePseqT1tKx+opk=
+github.com/go-sql-driver/mysql v1.4.0/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
+github.com/go-xorm/builder v0.0.0-20180322150003-a9b7ffcca3f0 h1:6cLhxUWQkTTOJ8VR6QzF9aaSP6Qm8fl7EKO1+KPz3dY=
+github.com/go-xorm/builder v0.0.0-20180322150003-a9b7ffcca3f0/go.mod h1:v8mE3MFBgtL+RGFNfUnAMUqqfk/Y4W5KuwCFQIEpQLk=
+github.com/go-xorm/core v0.0.0-20180322150003-0177c08cee88/go.mod h1:d8FJ9Br8OGyQl12MCclmYBuBqqxsyeedpXciV5Myih8=
+github.com/go-xorm/core v0.6.0 h1:tp6hX+ku4OD9khFZS8VGBDRY3kfVCtelPfmkgCyHxL0=
+github.com/go-xorm/core v0.6.0/go.mod h1:d8FJ9Br8OGyQl12MCclmYBuBqqxsyeedpXciV5Myih8=
+github.com/go-xorm/xorm v0.7.0 h1:u3X44NiN3ggNeeJO3f1xmHIFGAqh3qmCWS3ROuIBWmU=
+github.com/go-xorm/xorm v0.7.0/go.mod h1:xkHEPeHG0ckC95t/J9vR4tr4gE4944G/kGnDCGLAxlA=
+github.com/scofieldpeng/config-go v0.0.0-20180904140723-f66897e4003d h1:9tk4bEYdVJZzBaEUOv9L+05uoD3rWFFlEMoAT081QFA=
+github.com/scofieldpeng/config-go v0.0.0-20180904140723-f66897e4003d/go.mod h1:2xJ5ThDG8nm1yFA7fu7AmPFWC6QrAAtY9Nk8OjoZ62M=
+github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec h1:DGmKwyZwEB8dI7tbLt/I/gQuP559o/0FrAkHKlQM/Ks=
+github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec/go.mod h1:owBmyHYMLkxyrugmfwE/DLJyW8Ro9mkphwuVErQ0iUw=

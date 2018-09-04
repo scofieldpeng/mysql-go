@@ -34,7 +34,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
-	appConfig "github.com/scofieldpeng/config"
+	appConfig "github.com/scofieldpeng/config-go"
 	"github.com/vaughan0/go-ini"
 	"io"
 	"math/rand"
