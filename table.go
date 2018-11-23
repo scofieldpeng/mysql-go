@@ -7,35 +7,19 @@ import (
 )
 
 type Table interface {
-	// 获取表节点
-	TableNode() string
+	SelfObj() *xorm.TableName
 }
 
 type TableFactory struct {
-	tableNode string      `json:"-" xorm:"-" xml:"-"`
-	tableObj  interface{} `json:"-" xorm:"-" xml:"-"`
-}
-
-func NewTableFactory() *TableFactory {
-	tf := &TableFactory{}
-	tf.tableNode = "default"
-	tf.tableObj = tf
-
-	return tf
+	tableNode string `json:"-" xorm:"-" xml:"-"`
+	myself    func() interface{}
 }
 
 func (tf TableFactory) checkNode() error {
 	if tf.tableNode == "" {
 		return errors.New("table_node not set")
 	}
-
-	return nil
-}
-
-func (tf TableFactory) checkObj() error {
-	if tf.tableObj == nil {
-		return errors.New("pls use NewXXX function to create a table struct")
-	}
+	
 	return nil
 }
 
@@ -44,10 +28,7 @@ func (tf TableFactory) check() error {
 	if err := tf.checkNode(); err != nil {
 		return err
 	}
-	if err := tf.checkObj(); err != nil {
-		return err
-	}
-
+	
 	return nil
 }
 
@@ -55,62 +36,93 @@ func (tf TableFactory) TableNode() string {
 	return tf.tableNode
 }
 
+func(tf TableFactory) Myself() interface{} {
+	return tf.myself()
+}
+
 func (tf *TableFactory) Insert() (affectRows int64, err error) {
 	if err := tf.check(); err != nil {
-
+		return affectRows, err
 	}
-	affectRows, err = Select(tf.tableNode).Master().Insert(tf.tableObj)
+	
+	affectRows, err = Select(tf.TableNode()).Master().Insert(tf.Myself())
 	return
 }
 
 // 删除表结构
 func (tf *TableFactory) Delete() (int64, error) {
-	return Select(tf.tableNode).Master().Delete(tf.tableObj)
+	return Select(tf.TableNode()).Master().Delete(tf.Myself())
 }
 
 // 查询一条数据
 func (tf *TableFactory) Get(fromMaster ...bool) (bool, error) {
 	if len(fromMaster) > 0 && fromMaster[0] {
-		return Select(tf.tableNode).Master().Get(tf.tableObj)
+		return Select(tf.TableNode()).Master().Get(tf.Myself())
 	}
-
-	return Select(tf.tableNode).Slave().Get(tf.tableObj)
+	
+	return Select(tf.TableNode()).Slave().Get(tf.Myself())
 }
 
 // 查询列表
-func (tf *TableFactory) Find(where string, fields string, fromMaster ...bool) (res []Table, err error) {
-	res = make([]Table, 0)
+func (tf *TableFactory) Find(where string, fields string, orderBy string, fromMaster ...bool) (res []interface{}, err error) {
+	var (
+		engine *xorm.Engine
+		master = false
+	)
+	
 	if where == "" {
 		return res, errors.New("where required")
 	}
-
-	master := false
+	
 	if len(fromMaster) > 0 && fromMaster[0] {
 		master = true
 	}
-
-	var (
-		engine *xorm.Engine
-	)
-
+	
 	if master {
-		engine = Select(tf.tableNode).Master()
+		engine = Select(tf.TableNode()).Master()
 	} else {
-		engine = Select(tf.tableNode).Slave()
+		engine = Select(tf.TableNode()).Slave()
 	}
-
+	
 	engine.Where(where)
 	if len(fields) == 0 {
 		engine.AllCols()
 	} else {
-		engine.Cols(strings.Split(fields,",")...)
+		engine.Cols(strings.Split(fields, ",")...)
 	}
-
-
+	
+	if orderBy != "" {
+		engine.OrderBy(orderBy)
+	}
+	
+	list := make([]interface{}, 0)
+	if err := engine.Table(tf.myself()).Find(&list); err != nil {
+		return res, err
+	}
+	
+	return list, err
 }
 
 // 更新表
-func (tf *TableFactory) Update(where string, whereData []interface{}, updateFields ...interface{}) (int64, error) {}
-
-// 单独定制一个
-func (tf *TableFactory) Exec(sql string, fromMaster ...bool) (int64, error) {}
+func (tf *TableFactory) Update(where string, whereData []interface{}, updateFields ...string) (int64, error) {
+	if err := tf.check(); err != nil {
+		return 0, err
+	}
+	
+	if where == "" {
+		return 0, errors.New("where condition required")
+	}
+	if len(whereData) == 0 {
+		return 0, errors.New("whereData required")
+	}
+	
+	session := Select(tf.TableNode()).Master().NewSession()
+	session.Where(where, whereData...)
+	if len(updateFields) == 0 {
+		session.AllCols()
+	} else {
+		session.Cols(updateFields...)
+	}
+	
+	return session.Update(tf.myself())
+}
