@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"errors"
+	"fmt"
 	"github.com/go-xorm/xorm"
 	"strings"
 )
@@ -19,7 +20,7 @@ func (tf TableFactory) checkNode() error {
 	if tf.tableNode == "" {
 		return errors.New("table_node not set")
 	}
-	
+
 	return nil
 }
 
@@ -28,7 +29,7 @@ func (tf TableFactory) check() error {
 	if err := tf.checkNode(); err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -36,7 +37,7 @@ func (tf TableFactory) TableNode() string {
 	return tf.tableNode
 }
 
-func(tf TableFactory) Myself() interface{} {
+func (tf TableFactory) Myself() interface{} {
 	return tf.myself()
 }
 
@@ -44,7 +45,7 @@ func (tf *TableFactory) Insert() (affectRows int64, err error) {
 	if err := tf.check(); err != nil {
 		return affectRows, err
 	}
-	
+
 	affectRows, err = Select(tf.TableNode()).Master().Insert(tf.Myself())
 	return
 }
@@ -59,47 +60,53 @@ func (tf *TableFactory) Get(fromMaster ...bool) (bool, error) {
 	if len(fromMaster) > 0 && fromMaster[0] {
 		return Select(tf.TableNode()).Master().Get(tf.Myself())
 	}
-	
+
 	return Select(tf.TableNode()).Slave().Get(tf.Myself())
 }
 
 // 查询列表
-func (tf *TableFactory) Find(where string, fields string, orderBy string, fromMaster ...bool) (res []interface{}, err error) {
+func (tf *TableFactory) Find(whereBuilder *WhereBuilder, fields string, orderBy string, fromMaster ...bool) (res []interface{}, err error) {
 	var (
-		engine *xorm.Engine
-		master = false
+		session   *xorm.Session
+		master        = false
+		whereData  = ""
+		whereArgs []interface{}
 	)
-	
-	if where == "" {
-		return res, errors.New("where required")
+
+	whereData, whereArgs = whereBuilder.Encode()
+	if len(whereData) == 0 {
+		return res, errors.New("where condition required")
 	}
-	
+	fmt.Printf("where: %s\n",whereData)
+	fmt.Printf("args: %v\n",whereArgs)
+
 	if len(fromMaster) > 0 && fromMaster[0] {
 		master = true
 	}
-	
+
 	if master {
-		engine = Select(tf.TableNode()).Master()
+		session = Select(tf.TableNode()).Master().NewSession()
 	} else {
-		engine = Select(tf.TableNode()).Slave()
+		session = Select(tf.TableNode()).Slave().NewSession()
 	}
-	
-	engine.Where(where)
+
 	if len(fields) == 0 {
-		engine.AllCols()
+		session.AllCols()
 	} else {
-		engine.Cols(strings.Split(fields, ",")...)
+		session.Cols(strings.Split(fields, ",")...)
 	}
-	
+
+	session.Where(whereData, whereArgs...)
+
 	if orderBy != "" {
-		engine.OrderBy(orderBy)
+		session.OrderBy(orderBy)
 	}
-	
+
 	list := make([]interface{}, 0)
-	if err := engine.Table(tf.myself()).Find(&list); err != nil {
+	if err := session.Table(tf.Myself()).Find(&list); err != nil {
 		return res, err
 	}
-	
+
 	return list, err
 }
 
@@ -108,14 +115,14 @@ func (tf *TableFactory) Update(where string, whereData []interface{}, updateFiel
 	if err := tf.check(); err != nil {
 		return 0, err
 	}
-	
+
 	if where == "" {
 		return 0, errors.New("where condition required")
 	}
 	if len(whereData) == 0 {
 		return 0, errors.New("whereData required")
 	}
-	
+
 	session := Select(tf.TableNode()).Master().NewSession()
 	session.Where(where, whereData...)
 	if len(updateFields) == 0 {
@@ -123,6 +130,6 @@ func (tf *TableFactory) Update(where string, whereData []interface{}, updateFiel
 	} else {
 		session.Cols(updateFields...)
 	}
-	
+
 	return session.Update(tf.myself())
 }
