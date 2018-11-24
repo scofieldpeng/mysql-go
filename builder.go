@@ -20,7 +20,7 @@ func NewWhereBuilder(args ...map[string]interface{}) *WhereBuilder {
 	if len(args) > 0 {
 		wb.data = args[0]
 	}
-
+	
 	return wb
 }
 
@@ -30,14 +30,23 @@ func (wb *WhereBuilder) Add(condition string, args interface{}) *WhereBuilder {
 	return wb
 }
 
+// 解析相关的参数
+func (wb *WhereBuilder) parseState(input string) string {
+	input = strings.TrimSpace(input)
+	if i := strings.LastIndexAny(input, "<>="); i == len(input)-1 {
+		return input
+	}
+	return input + "="
+}
+
 // Encode用来生成xorm的engine.Where()条件的两个参数
 func (wb *WhereBuilder) Encode() (whereStr string, beans []interface{}) {
 	whereArr := make([]string, 0, len(wb.data))
 	beans = make([]interface{}, 0, len(wb.data))
 	for k, v := range wb.data {
-		whereArr = append(whereArr, k+" ?")
+		whereArr = append(whereArr, wb.parseState(k)+"?")
 		beans = append(beans, v)
 	}
-
+	
 	return strings.Join(whereArr, " AND "), beans
 }

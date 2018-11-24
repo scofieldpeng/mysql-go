@@ -42,29 +42,40 @@ func TestTableFactory(t *testing.T) {
 		MaxIdle: 5,
 		MaxConn: 10,
 	}
-
+	
 	if err := Init(mysqlConfig, testConfig); err != nil {
 		t.Fatal("init fail!error:", err.Error())
 	}
-
+	
 	tt := newTestTable()
 	tt.Name = "scofield"
 	if _, err := tt.Insert(); err != nil {
 		t.Error(err.Error())
 	}
 	insertId := tt.Id
-
+	
 	tt = newTestTable()
 	tt.Id = insertId
 	if _, err := tt.Get(); err != nil {
 		t.Error(err.Error())
 	}
-	fmt.Printf("%v\n", tt)
-
+	
 	tt = newTestTable()
-	list, err := tt.Find(NewWhereBuilder(map[string]interface{}{"id>": 1}), "", "id ASC")
+	res := make([]testTable,0)
+	err := tt.Find(NewWhereBuilder(map[string]interface{}{"id>": 1}), "", "id ASC",&res)
 	if err != nil {
 		t.Error(err.Error())
 	}
-	fmt.Printf("res: %v\n", list)
+	
+	// test where sql builder
+	builder := NewWhereBuilder()
+	builder.Add("id",1)
+	builder.Add("id>",2)
+	where,_ := builder.Encode()
+	if where != "id=? AND id>?" {
+		t.Error("where builder failed,wrong:" + where)
+	}
+	t.Log(where)
+	
+	fmt.Printf("res: %v\n", res)
 }
