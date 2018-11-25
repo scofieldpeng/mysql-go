@@ -42,40 +42,55 @@ func TestTableFactory(t *testing.T) {
 		MaxIdle: 5,
 		MaxConn: 10,
 	}
-	
+
 	if err := Init(mysqlConfig, testConfig); err != nil {
 		t.Fatal("init fail!error:", err.Error())
 	}
-	
+
+	// test insert
 	tt := newTestTable()
 	tt.Name = "scofield"
 	if _, err := tt.Insert(); err != nil {
 		t.Error(err.Error())
 	}
 	insertId := tt.Id
-	
+
+	// test get
 	tt = newTestTable()
 	tt.Id = insertId
 	if _, err := tt.Get(); err != nil {
 		t.Error(err.Error())
 	}
-	
-	tt = newTestTable()
-	res := make([]testTable,0)
-	err := tt.Find(NewWhereBuilder(map[string]interface{}{"id>": 1}), "", "id ASC",&res)
-	if err != nil {
-		t.Error(err.Error())
-	}
-	
+
 	// test where sql builder
 	builder := NewWhereBuilder()
-	builder.Add("id",1)
-	builder.Add("id>",2)
-	where,_ := builder.Encode()
+	builder.Add("id", 1)
+	builder.Add("id>", 2)
+	where, _ := builder.Encode()
 	if where != "id=? AND id>?" {
 		t.Error("where builder failed,wrong:" + where)
 	}
-	t.Log(where)
-	
+
+	tt = newTestTable()
+	res := make([]testTable, 0)
+	err := tt.Find(NewWhereBuilder(map[string]interface{}{"id>": 1}), "", "id ASC", &res)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	// testUpdate
+	tt = newTestTable()
+	tt.Name = "julia"
+	if _, err = tt.Update(NewWhereBuilder(map[string]interface{}{"id": insertId})); err != nil {
+		t.Error(err.Error())
+	}
+
+	// testDelete
+	tt = newTestTable()
+	tt.Id = insertId
+	if _, err = tt.Delete(); err != nil {
+		t.Error(err.Error())
+	}
+
 	fmt.Printf("res: %v\n", res)
 }
