@@ -131,13 +131,15 @@ func (e *engine) Slave(slave ...string) *xorm.Engine {
 	if len(slave) != 0 {
 		selectSlave = true
 	}
-	if !selectSlave {
+	if !selectSlave && len(e.slaveNames) > 0 {
 		slave = make([]string, 1)
 		rand.Seed(time.Now().UnixNano())
 		slave[0] = e.slaveNames[rand.Intn(len(e.slaveNamesMap))]
+		
+		return engines[slave[0]].xormEngine
 	}
-
-	return engines[slave[0]].xormEngine
+	
+	return e.Engine()
 }
 
 // 获取主节点
