@@ -13,7 +13,7 @@ type Table interface {
 
 type TableFactory struct {
 	tableNode string `json:"-" xorm:"-" xml:"-"`
-	myself    func() interface{}
+	myself    func() interface{} `json:"-" xorm:"-"`
 }
 
 func (tf TableFactory) checkNode() error {
@@ -31,6 +31,10 @@ func (tf TableFactory) check() error {
 	}
 
 	return nil
+}
+
+func (tf *TableFactory) SetMyself(self func() interface{}) {
+	tf.myself = self
 }
 
 func (tf TableFactory) TableNode() string {
