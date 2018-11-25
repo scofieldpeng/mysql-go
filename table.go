@@ -37,6 +37,10 @@ func (tf *TableFactory) SetMyself(self func() interface{}) {
 	tf.myself = self
 }
 
+func (tf *TableFactory) SetTableNode(node string) {
+	tf.tableNode = node
+}
+
 func (tf TableFactory) TableNode() string {
 	return tf.tableNode
 }
