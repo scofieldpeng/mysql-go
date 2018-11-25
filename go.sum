@@ -23,6 +23,8 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/scofieldpeng/config v0.0.0-20180529180040-2470942ddc14 h1:50f1oLSuS/1zZd67pKgYOIerbtcUrd//v9R/+zw5pjg=
 github.com/scofieldpeng/config v0.0.0-20180529180040-2470942ddc14/go.mod h1:wcMTzJQdTX8Ogb8vQdfrBpL9+Y/UXPKep/nHKXqTYzY=
+github.com/scofieldpeng/config-go v0.0.0-20180904140723-f66897e4003d h1:9tk4bEYdVJZzBaEUOv9L+05uoD3rWFFlEMoAT081QFA=
+github.com/scofieldpeng/config-go v0.0.0-20180904140723-f66897e4003d/go.mod h1:2xJ5ThDG8nm1yFA7fu7AmPFWC6QrAAtY9Nk8OjoZ62M=
 github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24/go.mod h1:M+9NzErvs504Cn4c5DxATwIqPbtswREoFCre64PpcG4=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec h1:DGmKwyZwEB8dI7tbLt/I/gQuP559o/0FrAkHKlQM/Ks=
