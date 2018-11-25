@@ -27,7 +27,7 @@ func (t testTable) TableNode() string {
 func newTestTable() *testTable {
 	t := &testTable{}
 	t.tableNode = "default"
-	t.myself = t.self
+	t.SetMyself(t.self)
 	return t
 }
 
