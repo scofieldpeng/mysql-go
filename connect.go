@@ -34,7 +34,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
-	appConfig "github.com/scofieldpeng/config"
+	appConfig "github.com/scofieldpeng/config-go"
 	"github.com/vaughan0/go-ini"
 	"io"
 	"math/rand"
@@ -53,6 +53,8 @@ type (
 		maxIdle int
 		// 最大连接数量
 		maxConn int
+		// 超时时间
+		timeout time.Duration
 	}
 	Config struct {
 		Debug bool
@@ -60,6 +62,8 @@ type (
 		MaxIdle int
 		// 最大连接数量
 		MaxConn int
+		// 超时时间
+		Timeout time.Duration
 		// log writer
 		LogWriter io.Writer
 		// log prefix
@@ -72,8 +76,9 @@ type (
 )
 
 const (
-	DefaultIdleNum     = 5  // 默认的连接池空闲数大小
-	DefaultMaxOpenConn = 10 // 默认的最大打开连接数
+	DefaultIdleNum     = 5                               // 默认的连接池空闲数大小
+	DefaultMaxOpenConn = 10                              // 默认的最大打开连接数
+	DefaultTimeout     = time.Duration(30) * time.Second // 默认超时时间
 
 	DEFAULT_CONN_PREFIX = "mysql_node_"
 )
@@ -88,6 +93,7 @@ var (
 		LogPrefix: xorm.DEFAULT_LOG_PREFIX,
 		LogFlag:   xorm.DEFAULT_LOG_FLAG,
 		LogLevel:  xorm.DEFAULT_LOG_LEVEL,
+		Timeout:   DefaultTimeout,
 	}
 
 	// Engine没有找到
@@ -113,6 +119,9 @@ func (c *Config) Set(config Config) {
 	}
 	if int(config.LogFlag) > 0 {
 		c.LogFlag = config.LogFlag
+	}
+	if config.Timeout.Seconds() > 0 {
+		c.Timeout = config.Timeout
 	}
 }
 
@@ -200,6 +209,7 @@ func Init(mysqlConfig Config, connConfig ini.File) error {
 			return errors.New(fmt.Sprintf("found invalid mysql dsn,key:%s", DEFAULT_CONN_PREFIX+k))
 		}
 		xormEngine.ShowSQL(config.Debug)
+		xormEngine.ShowExecTime(config.Debug)
 		xormEngine.SetMaxIdleConns(mysqlEngine.maxIdle)
 		xormEngine.SetMaxOpenConns(mysqlEngine.maxConn)
 		xormEngine.SetLogger(xorm.NewSimpleLogger3(config.LogWriter, config.LogPrefix, config.LogFlag, config.LogLevel))
@@ -223,6 +233,17 @@ func Init(mysqlConfig Config, connConfig ini.File) error {
 	if !findDefault {
 		fmt.Println("[warning]config中没有找到default的配置项，请勿使用mysql.Select()或者mysql.Select(\"default\")")
 	}
+
+	go func() {
+		for _, v := range engines {
+			go func() {
+				for {
+					v.xormEngine.Ping()
+					time.Sleep(config.Timeout)
+				}
+			}()
+		}
+	}()
 
 	return nil
 }
