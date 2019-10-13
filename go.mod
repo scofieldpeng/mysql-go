@@ -8,3 +8,5 @@ require (
 	github.com/scofieldpeng/config-go v0.0.0-20180904140723-f66897e4003d
 	github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec
 )
+
+go 1.13
