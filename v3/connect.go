@@ -135,10 +135,10 @@ func (e *engine) Slave(slave ...string) *xorm.Engine {
 		slave = make([]string, 1)
 		rand.Seed(time.Now().UnixNano())
 		slave[0] = e.slaveNames[rand.Intn(len(e.slaveNamesMap))]
-		
+
 		return engines[slave[0]].xormEngine
 	}
-	
+
 	return e.Engine()
 }
 
@@ -178,7 +178,7 @@ func Init(mysqlConfig Config, connConfig ini.File) error {
 	config.Set(mysqlConfig)
 	engines = make(map[string]*engine)
 
-	for k, _ := range connConfig {
+	for k := range connConfig {
 		if strings.Index(k, DEFAULT_CONN_PREFIX) == 0 {
 			sectionName := string([]byte(k)[len(DEFAULT_CONN_PREFIX):])
 			if len(sectionName) > 0 && appConfig.String(connConfig.Get(k, "dsn")) != "" {
@@ -191,7 +191,7 @@ func Init(mysqlConfig Config, connConfig ini.File) error {
 	}
 
 	// 遍历,初始化配置项
-	for k, _ := range connNameMap {
+	for k := range connNameMap {
 		if k == "default" {
 			findDefault = true
 		}
