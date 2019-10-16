@@ -12,5 +12,3 @@ require (
 )
 
 replace github.com/go-xorm/xorm => xorm.io/xorm v0.7.9
-
-replace github.com/go-xorm/core => xorm.io/core v0.7.2
