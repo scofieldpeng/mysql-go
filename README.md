@@ -5,7 +5,7 @@ a simple mysql package for golang projects base on xorm,support connection pools
 ## install
 
 ```go
-go get github.com/scofieldpeng/mysql-go
+go get github.com/scofieldpeng/mysql-go/v3
 ```
 
 ## Usage
