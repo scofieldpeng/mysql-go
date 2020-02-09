@@ -42,6 +42,9 @@ func (tf *TableFactory) SetTableNode(node string) {
 }
 
 func (tf TableFactory) TableNode() string {
+	if tf.tableNode == "" {
+		return "default"
+	}
 	return tf.tableNode
 }
 

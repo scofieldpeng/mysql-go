@@ -32,7 +32,6 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/go-xorm/xorm"
 	appConfig "github.com/scofieldpeng/config-go/v3"
 	"github.com/vaughan0/go-ini"
 	"io"
@@ -41,6 +40,7 @@ import (
 	"strings"
 	"time"
 	"xorm.io/core"
+	"xorm.io/xorm"
 )
 
 // engine mysql的连接对象

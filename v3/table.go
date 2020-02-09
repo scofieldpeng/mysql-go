@@ -3,8 +3,8 @@ package mysql
 import (
 	"errors"
 	"fmt"
-	"github.com/go-xorm/xorm"
 	"strings"
+	"xorm.io/xorm"
 )
 
 type Table interface {
